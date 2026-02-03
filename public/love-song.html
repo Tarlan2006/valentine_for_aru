@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Love Song | Presents for you</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="song-page">
+  <div class="floating-hearts" aria-hidden="true"></div>
+  <main class="page song-layout">
+    <section class="song-card" aria-label="Love song gift">
+      <p class="eyebrow">Presents inside</p>
+      <h1 class="present-title">Presents for you</h1>
+      <p class="subtitle spaced">Click any button to open</p>
+
+      <div class="song-grid two-up">
+        <div class="song-player media-player no-bar" data-type="html5">
+          <div class="player-frame tv-frame">
+            <video class="media" src="/assets/video/1_video.mp4" title="Love video 1" autoplay muted playsinline loop></video>
+            <button class="unmute-btn audio-toggle" type="button" aria-label="Toggle sound">Tap for sound</button>
+          </div>
+          <p class="video-meta">Created: 25.12.25</p>
+        </div>
+
+        <div class="song-player media-player" data-type="youtube">
+          <div class="player-frame">
+            <iframe class="media" src="https://www.youtube.com/embed/CwGbMYLjIpQ?autoplay=1&mute=1&playsinline=1&rel=0&enablejsapi=1" title="Love song" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy" playsinline></iframe>
+            <button class="unmute-btn audio-toggle" type="button" aria-label="Toggle sound">Tap for sound</button>
+          </div>
+          <div class="player-bar">
+            <div class="bar-btn play" aria-hidden="true"></div>
+            <div class="bar-progress" aria-hidden="true">
+              <div class="bar-fill"></div>
+            </div>
+            <div class="bar-btn heart" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="memory-actions actions-stack">
+        <div class="actions-row">
+          <button class="btn message-highlight" type="button" onclick="window.location.href='/message-from-past'">Message from the past</button>
+        </div>
+        <div class="actions-row">
+          <button class="btn back" type="button" onclick="window.location.href='/yes#presents'">Back</button>
+          <button class="btn primary" type="button" onclick="window.location.href='/'">Back to start</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const players = Array.from(document.querySelectorAll('.media-player'));
+      if (!players.length) return;
+
+      const playSafe = (el) => {
+        if (!el) return;
+        if (el.tagName === 'VIDEO') {
+          el.play().catch(() => {});
+        }
+      };
+
+      const setupHtml5 = (player) => {
+        const video = player.querySelector('video.media');
+        const btn = player.querySelector('.audio-toggle');
+        if (!video) return;
+        video.muted = true;
+        video.playsInline = true;
+        video.autoplay = true;
+        playSafe(video);
+
+        const toggle = () => {
+          const willUnmute = video.muted;
+          video.muted = !willUnmute;
+          video.volume = willUnmute ? 1 : 0;
+          playSafe(video);
+          if (btn) btn.textContent = willUnmute ? 'Mute' : 'Tap for sound';
+        };
+        btn?.addEventListener('click', toggle);
+        video.addEventListener('click', toggle);
+      };
+
+      const setupYouTube = (player) => {
+        const iframe = player.querySelector('iframe.media');
+        const btn = player.querySelector('.audio-toggle');
+        if (!iframe) return;
+
+        const url = new URL(iframe.src);
+        url.searchParams.set('autoplay', '1');
+        url.searchParams.set('mute', '1');
+        url.searchParams.set('playsinline', '1');
+        url.searchParams.set('enablejsapi', '1');
+        url.searchParams.set('rel', '0');
+        url.searchParams.set('origin', window.location.origin);
+        iframe.src = url.toString();
+
+        const sendCommand = (func, args = []) => {
+          iframe.contentWindow?.postMessage(JSON.stringify({ event: 'command', func, args }), '*');
+        };
+
+        let isMuted = true;
+        const toggle = () => {
+          if (isMuted) {
+            sendCommand('unMute');
+            sendCommand('setVolume', [100]);
+            sendCommand('playVideo');
+          } else {
+            sendCommand('mute');
+            sendCommand('setVolume', [0]);
+          }
+          isMuted = !isMuted;
+          if (btn) btn.textContent = isMuted ? 'Tap for sound' : 'Mute';
+        };
+
+        btn?.addEventListener('click', toggle);
+        iframe.addEventListener('click', toggle);
+      };
+
+      players.forEach((player) => {
+        const type = player.dataset.type;
+        if (type === 'youtube') {
+          setupYouTube(player);
+        } else {
+          setupHtml5(player);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

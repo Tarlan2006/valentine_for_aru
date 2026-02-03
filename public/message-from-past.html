@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Message from the past</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="song-page">
+  <div class="floating-hearts" aria-hidden="true"></div>
+  <main class="page song-layout">
+    <section class="song-card" aria-label="Message from the past">
+      <p class="eyebrow">Special video</p>
+      <h1 class="present-title">Message from the past</h1>
+      <p class="subtitle spaced">Created: 13.10.23</p>
+
+      <div class="song-grid two-up">
+        <div class="song-player media-player no-bar" data-type="html5">
+          <div class="player-frame tv-frame">
+            <video class="media" src="https://www.dropbox.com/scl/fi/6uq9ci83kwu7e7e32s1eo/13.10.2023.mp4?rlkey=iun3clpt0m6cp16ij85pejybe&st=6nqidsya&dl=1" title="Love video 2" autoplay muted playsinline loop></video>
+            <button class="unmute-btn audio-toggle" type="button" aria-label="Toggle sound">Tap for sound</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="memory-actions">
+        <button class="btn back" type="button" onclick="window.history.back()">Back</button>
+        <button class="btn primary" type="button" onclick="window.location.href='/'">Back to start</button>
+      </div>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const player = document.querySelector('.media-player');
+      if (!player) return;
+      const video = player.querySelector('video.media');
+      const btn = player.querySelector('.audio-toggle');
+      if (!video) return;
+
+      const playSafe = () => video.play().catch(() => {});
+      video.muted = true;
+      video.playsInline = true;
+      video.autoplay = true;
+      playSafe();
+
+      const toggle = () => {
+        const willUnmute = video.muted;
+        video.muted = !willUnmute;
+        video.volume = willUnmute ? 1 : 0;
+        playSafe();
+        if (btn) btn.textContent = willUnmute ? 'Mute' : 'Tap for sound';
+      };
+
+      btn?.addEventListener('click', toggle);
+      video.addEventListener('click', toggle);
+    })();
+  </script>
+</body>
+</html>
